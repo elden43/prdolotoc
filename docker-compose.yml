@@ -1,0 +1,67 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: prdolotoc
+      POSTGRES_USER: prdolotoc
+      POSTGRES_PASSWORD: prdolotoc
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - prdolotoc_net
+
+  php-fpm:
+    build:
+      context: .
+      dockerfile: Dockerfile.php
+    working_dir: /app/backend
+    volumes:
+      - ./:/app
+    environment:
+      APP_ENV: dev
+      DATABASE_URL: postgresql://prdolotoc:prdolotoc@db:5432/prdolotoc?serverVersion=16&charset=utf8
+    depends_on:
+      - db
+    networks:
+      - prdolotoc_net
+
+  php-cli:
+    build:
+      context: .
+      dockerfile: Dockerfile.php
+    working_dir: /app/backend
+    volumes:
+      - ./:/app
+    environment:
+      APP_ENV: dev
+      DATABASE_URL: postgresql://prdolotoc:prdolotoc@db:5432/prdolotoc?serverVersion=16&charset=utf8
+    depends_on:
+      - db
+    command: ["sleep", "infinity"]
+    networks:
+      - prdolotoc_net
+
+  frontend:
+    image: node:22-alpine
+    working_dir: /app/frontend
+    volumes:
+      - ./:/app
+    command: ["sleep", "infinity"]
+    networks:
+      - prdolotoc_net
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "8080:80"
+    networks:
+      - prdolotoc_net
+
+networks:
+  prdolotoc_net:
+    driver: bridge
+
+volumes:
+  db_data:
