@@ -20,10 +20,15 @@ The goal of this document is to give the coding agent a precise target for:
 ## 2. Backend (Symfony API)
 
 ### 2.1 Runtime & Framework
-- **PHP:** 8.3+
+- **PHP:** 8.3+ (running **only inside Docker**; no PHP/Composer/Symfony required on host)
 - **Symfony:** Latest LTS, API-style (no Twig, JSON-only responses)
 - **Database:** PostgreSQL (via Doctrine ORM)
 - **Process model:** Stateless HTTP API, no sessions.
+- **Execution model for CLI:** All Symfony Console and Composer commands are executed via Docker Compose, for example:
+  - `docker compose run --rm php-cli composer install`
+  - `docker compose exec php-fpm php bin/console doctrine:migrations:migrate`
+
+Host machine is expected to have only Docker + Docker Compose (or `docker compose`), **no PHP toolchain**.
 
 ### 2.2 Domain Model
 
@@ -277,18 +282,24 @@ Base path: `/api`.
 
 Services (target):
 
-- `db` – PostgreSQL
+- `db` – PostgreSQL container
   - Exposes port (e.g. `5432` to host for local dev if needed).
   - Proper volumes for data persistence.
-- `backend` – PHP-FPM running Symfony app
-  - Uses the same code volume as host (`./backend`).
-  - Runs `php-fpm` with proper entrypoint.
-- `frontend` – Next.js app
+- `php-fpm` – PHP-FPM container running Symfony app
+  - Built from a local `Dockerfile.php` (PHP 8.3, CLI + FPM + Composer inside image).
+  - Mounts `./backend` as a volume for dev.
+  - Never requires PHP/Composer on host.
+- `php-cli` – auxiliary PHP CLI container (same image as `php-fpm`)
+  - Used for running one-off commands via `docker compose run --rm php-cli ...`.
+  - E.g. migrations, tests, Symfony console commands.
+- `frontend` – Next.js app container
+  - Built from a local `Dockerfile.frontend` (Node LTS).
   - Dev mode in local environment (`next dev`).
-  - Production mode can be a separate image / build stage.
+  - May later get a separate production build stage.
 - `nginx` – reverse proxy & static file server
-  - Routes `/api` → backend container (php-fpm / Symfony).
-  - Routes `/` → frontend (dev server in dev, built static files in prod).
+  - Built from `Dockerfile.nginx` with a mounted or copied nginx config under `/infra/nginx`.
+  - Routes `/api` → `php-fpm` container (Symfony backend).
+  - Routes `/` → `frontend` container (Next dev server in dev; built static files in prod).
 
 Networking:
 - Single Docker network for all services (e.g. `prdolotoc_net`).
@@ -297,31 +308,41 @@ Networking:
 Logs:
 - Map nginx and app logs to `./logs/...`.
 
+CLI usage pattern (canonical):
+- Composer & Symfony console:
+  - `docker compose run --rm php-cli composer install`
+  - `docker compose run --rm php-cli php bin/console doctrine:migrations:diff`
+  - `docker compose exec php-fpm php bin/console doctrine:migrations:migrate`
+- Backend tests:
+  - `docker compose run --rm php-cli ./vendor/bin/phpunit`
+
+All backend-related CLI workflows are expected to follow this pattern; **no `php` or `composer` binaries are required on the host**.
+
 ### 4.3 Makefile Targets (Target)
 
 Top-level `Makefile` in repo root should define at least:
 
 - `make up`
   - Ensure `logs/` directory exists.
-  - Run `docker-compose up -d` with all services.
+  - Run `docker compose up -d` with all services (db + php-fpm + php-cli + frontend + nginx).
 - `make down`
-  - Stop and remove containers (and optional networks).
+  - Stop and remove containers (and optional networks) via `docker compose down`.
 - `make logs`
-  - Tail main service logs (nginx + backend + frontend) from `logs/` or docker.
+  - Tail main service logs (nginx + backend + frontend) from `logs/` or `docker compose logs -f`.
 - `make backend-shell`
-  - Open shell in backend container for debugging (e.g. `docker-compose exec backend bash`).
+  - Open shell in backend PHP-FPM container for debugging (e.g. `docker compose exec php-fpm bash`).
 - `make frontend-shell`
-  - Open shell in frontend container.
+  - Open shell in frontend container (e.g. `docker compose exec frontend bash`).
 - `make db-shell`
-  - Open psql shell.
+  - Open psql shell via `docker compose exec db psql`.
 - `make qa`
-  - Run backend + frontend checks (tests + linters) in containers or host.
+  - Run backend + frontend checks (tests + linters) via containers using `docker compose run`.
 - `make test`
-  - Run full test suite (backend + frontend).
+  - Run full test suite (backend + frontend) via containers.
 - `make lint`
-  - Run linters (PHP-CS-Fixer/PHPStan + ESLint/TypeScript).
+  - Run linters (PHP-CS-Fixer/PHPStan + ESLint/TypeScript) via containers.
 - `make build`
-  - Build production images / frontend bundle.
+  - Build production images / frontend bundle using `docker compose build`.
 
 The exact implementation can evolve, but **task names** above are the expected contract.
 

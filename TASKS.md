@@ -10,29 +10,30 @@ should be referenced in branches/PRs.
 
 ## Backend – Symfony API & Domain
 
-### T1 – Bootstrap Symfony Backend Skeleton
+### T1 – Bootstrap Symfony Backend Skeleton (Docker-only)
 - **Depends on:** –
 - **Description:**
   - Create `/backend` Symfony application (latest LTS, PHP 8.3+), API-style skeleton.
   - Configure basic project structure for JSON-only API (no Twig).
+  - Ensure the app can be run **only inside Docker** (no host PHP required).
 - **Includes:**
   - New Symfony project under `/backend`.
   - Packages for Doctrine and PostgreSQL driver installed.
-  - Basic `.env` with DB connection placeholders (host/user/password/db).
+  - Basic `.env` with DB connection placeholders (host/user/password/db), using `db` as host for Docker.
 - **Done when:**
-  - `cd backend && symfony console about` (or equivalent) runs successfully.
+  - Backend boots successfully via a container command, e.g. `docker compose run --rm php-cli php bin/console about` from repo root.
   - App bootstrap is committed and ready for further tasks.
 
-### T2 – Configure Doctrine + PostgreSQL Connection
+### T2 – Configure Doctrine + PostgreSQL Connection (Containerised)
 - **Depends on:** T1
 - **Description:**
   - Wire Doctrine ORM to PostgreSQL according to `ARCHITECTURE.md`.
 - **Includes:**
-  - DB connection configured via `.env` / `.env.local` (host `db` for Docker, `localhost` for local).
+  - DB connection configured via `.env` / `.env.local` (host `db` for Docker, optional `localhost` override if ever needed).
   - Doctrine migrations bundle installed and configured.
 - **Done when:**
-  - `cd backend && php bin/console doctrine:migrations:diff` runs and sees no errors on empty schema.
-  - Local manual connection to DB (using configured params) works in dev.
+  - `docker compose run --rm php-cli php bin/console doctrine:migrations:diff` runs and sees no errors on empty schema.
+  - Connection from the `php-cli` container to the `db` container works in dev.
 
 ### T3 – Health Endpoint Implementation
 - **Depends on:** T1, T2 (DB optional but preferred)
@@ -41,10 +42,10 @@ should be referenced in branches/PRs.
 - **Includes:**
   - Route definition.
   - Controller returning `{ "status": "ok" }` JSON.
-  - Basic functional test.
+  - Basic functional test executed from inside containers.
 - **Done when:**
-  - `GET /api/health` returns HTTP 200 with JSON body `{ "status": "ok" }` in local dev.
-  - Corresponding test passes.
+  - With the stack up (`make up`), `GET /api/health` via nginx returns HTTP 200 with JSON body `{ "status": "ok" }` in local dev.
+  - Corresponding test passes when run via `docker compose run --rm php-cli ./vendor/bin/phpunit`.
 
 ### T4 – SpinConfig Entity + Migration
 - **Depends on:** T2
@@ -53,9 +54,9 @@ should be referenced in branches/PRs.
 - **Includes:**
   - Fields: `id`, `name`, `slug`, `options`, `removeAfterPick`, `visualMode`, `createdAt`.
   - DB-level constraints (unique index on `slug`).
-  - Migration created and runnable.
+  - Migration created and runnable via Docker (`docker compose run --rm php-cli php bin/console doctrine:migrations:diff`).
 - **Done when:**
-  - Migration runs successfully against dev database.
+  - Migration runs successfully against dev database via `docker compose exec php-fpm php bin/console doctrine:migrations:migrate`.
   - Table structure matches the domain model in `ARCHITECTURE.md`.
 
 ### T5 – SpinConfig Slug Generation Service
@@ -69,6 +70,7 @@ should be referenced in branches/PRs.
 - **Done when:**
   - Service can generate slugs for typical names and for collisions.
   - Tests cover at least: basic name, duplicate name, non-ASCII characters.
+  - Test suite runs successfully via `docker compose run --rm php-cli ./vendor/bin/phpunit`.
 
 ### T6 – Global JSON Error Response Helper
 - **Depends on:** T1
@@ -80,7 +82,7 @@ should be referenced in branches/PRs.
   - Integration with Symfony validation errors for `validation_failed`.
 - **Done when:**
   - Manual 404 or validation errors return JSON structure matching `ARCHITECTURE.md`.
-  - At least one test asserts JSON error shape.
+  - At least one test asserts JSON error shape, executed via `docker compose run --rm php-cli ./vendor/bin/phpunit`.
 
 ### T7 – POST /api/spin-configs Endpoint
 - **Depends on:** T4, T5, T6
@@ -93,9 +95,9 @@ should be referenced in branches/PRs.
   - Normalisation of `options` (trim, drop empties).
   - Defaulting of `removeAfterPick` and `visualMode` per `ARCHITECTURE.md`.
 - **Done when:**
-  - Valid payload returns 201 with JSON body matching `SpinConfig` schema.
+  - With stack up (`make up`), valid payload sent through nginx (e.g. `POST http://localhost:8080/api/spin-configs`) returns 201 with JSON body matching `SpinConfig` schema.
   - Invalid payload returns 400 with `error: "validation_failed"` and proper `details`.
-  - Basic functional tests (happy path + at least two invalid cases) pass.
+  - Basic functional tests (happy path + at least two invalid cases) pass when run via `docker compose run --rm php-cli ./vendor/bin/phpunit`.
 
 ### T8 – GET /api/spin-configs/{slugOrId} Endpoint
 - **Depends on:** T4, T6
@@ -105,21 +107,21 @@ should be referenced in branches/PRs.
   - Lookup by `slug` primarily (optionally by `id`).
   - Return 404 with consistent JSON error on missing config.
 - **Done when:**
-  - Existing config can be retrieved by slug.
+  - With stack up (`make up`), existing config can be retrieved by slug through nginx (`GET /api/spin-configs/{slug}`).
   - Unknown slug returns 404 with `error: "not_found"` and message as per `ARCHITECTURE.md`.
-  - Functional tests cover success + 404.
+  - Functional tests cover success + 404 and run via `docker compose run --rm php-cli ./vendor/bin/phpunit`.
 
-### T9 – Backend Test & QA Wiring
+### T9 – Backend Test & QA Wiring (Containerised)
 - **Depends on:** T3, T7, T8
 - **Description:**
-  - Ensure backend has a minimal but reliable test suite and QA commands.
+  - Ensure backend has a minimal but reliable test suite and QA commands, all runnable via Docker.
 - **Includes:**
   - PHPUnit configuration for functional tests.
   - At least one test class per endpoint.
-  - Composer scripts or Makefile entries to run backend tests and code style (lint).
+  - Composer scripts or Makefile entries that delegate to `docker compose run` / `docker compose exec`.
 - **Done when:**
-  - `cd backend && composer test` (or equivalent) runs and passes.
-  - A single command exists to run backend tests from repo root (used by `make test` later).
+  - `docker compose run --rm php-cli composer test` (or equivalent) runs and passes.
+  - A single command exists to run backend tests from repo root (e.g. `make test-backend`) and it uses containers only.
 
 ---
 
@@ -220,10 +222,10 @@ should be referenced in branches/PRs.
 - **Description:**
   - Create `docker-compose.yml` with base services and shared network.
 - **Includes:**
-  - Services defined: `db`, `backend`, `frontend`, `nginx` (even if images not fully wired yet).
+  - Services defined: `db`, `php-fpm`, `php-cli`, `frontend`, `nginx` (even if images not fully wired yet).
   - Shared network for all services.
 - **Done when:**
-  - `docker-compose config` succeeds and shows expected services.
+  - `docker compose config` succeeds and shows expected services.
 
 ### T21 – PostgreSQL Service Configuration
 - **Depends on:** T20
@@ -233,40 +235,44 @@ should be referenced in branches/PRs.
   - Image, volumes, basic env vars (user/password/db name).
   - Expose port if useful for local debugging.
 - **Done when:**
-  - `docker-compose up db` starts PostgreSQL and is reachable from host.
+  - `docker compose up db` starts PostgreSQL and is reachable from host.
 
 ### T22 – Backend Service & PHP-FPM Wiring
 - **Depends on:** T20, T1, T2
 - **Description:**
-  - Configure `backend` service running Symfony via PHP-FPM.
+  - Configure `php-fpm` and `php-cli` services running Symfony via PHP-FPM and CLI.
 - **Includes:**
-  - Dockerfile or image reference for PHP 8.3 + needed extensions.
-  - Volume mount of `/backend` source into container.
+  - `Dockerfile.php` defining a PHP 8.3 image with both FPM and CLI, plus Composer installed inside the image.
+  - `php-fpm` service using this image and mounting `/backend` source into the container.
+  - `php-cli` service using the same image for one-off commands via `docker compose run --rm php-cli ...`.
   - Environment variables wired from `docker-compose.yml` to backend.
 - **Done when:**
-  - `docker-compose up backend` runs PHP-FPM without crashing.
+  - `docker compose up php-fpm` runs PHP-FPM without crashing.
+  - `docker compose run --rm php-cli php bin/console about` works from repo root.
 
 ### T23 – Frontend Service Configuration
 - **Depends on:** T20, T10
 - **Description:**
   - Configure `frontend` service running Next.js dev server for local dev.
 - **Includes:**
-  - Node image with dependencies installed.
-  - Volume mount of `/frontend`.
-  - Command to run `npm run dev`.
+  - `Dockerfile.frontend` based on Node LTS with dependencies installed (Yarn/NPM).
+  - Volume mount of `/frontend` for fast local iteration.
+  - Command to run `npm run dev` (or `yarn dev`) inside the container.
 - **Done when:**
-  - `docker-compose up frontend` starts Next.js dev server accessible inside network.
+  - `docker compose up frontend` starts Next.js dev server accessible inside the Docker network (and via nginx once T24 is done).
 
 ### T24 – Nginx Reverse Proxy & Routing
 - **Depends on:** T22, T23
 - **Description:**
   - Configure `nginx` service to route `/api` to backend and `/` to frontend.
 - **Includes:**
-  - Nginx config file(s) under `/infra` or similar.
-  - Proxy to backend container for `/api` requests.
-  - Proxy or static hosting for frontend (dev: proxy to frontend service).
+  - `Dockerfile.nginx` using an nginx base image.
+  - Nginx config file(s) under `/infra/nginx` with:
+    - `/api` proxied to `php-fpm` service (Symfony backend).
+    - `/` proxied to `frontend` service in dev (Next dev server).
+  - (Optional later) Static hosting of built frontend for production.
 - **Done when:**
-  - `docker-compose up nginx backend frontend` allows browsing app via single port (e.g. `http://localhost:8080`).
+  - `docker compose up nginx php-fpm frontend` allows browsing app via single port (e.g. `http://localhost:8080`).
   - `GET /api/health` routed through nginx works.
 
 ### T25 – Logs Directory & Wiring
@@ -279,16 +285,20 @@ should be referenced in branches/PRs.
 - **Done when:**
   - Running stack writes logs into `./logs` (e.g. `logs/nginx/access.log`).
 
-### T26 – Top-Level Makefile
+### T26 – Top-Level Makefile + Local Dev Workflow
 - **Depends on:** T21, T22, T23, T24, T25, T9, T16
 - **Description:**
-  - Implement Makefile commands described in `ARCHITECTURE.md`.
+  - Implement Makefile commands described in `ARCHITECTURE.md` and define the canonical local dev workflow.
 - **Includes:**
   - Targets: `up`, `down`, `logs`, `backend-shell`, `frontend-shell`, `db-shell`, `qa`, `test`, `lint`, `build`.
-  - `qa` runs backend + frontend tests and linters.
+  - All targets internally use `docker compose` (no direct `php`, `composer`, `npm` on host).
+  - `qa` runs backend + frontend tests and linters via containers.
+  - Document a short **"How to run locally"** section in `README.md` or `MANUAL-QA.md` with at least:
+    - `make up` → start full stack (db + php-fpm + php-cli + frontend + nginx).
+    - `make qa` → run tests + linters via containers.
 - **Done when:**
-  - `make up` starts full stack (db + backend + frontend + nginx) and ensures `logs/` exists.
-  - `make qa` runs all checks and passes on a fresh clone.
+  - `make up` starts full stack (db + php-fpm + php-cli + frontend + nginx) and ensures `logs/` exists.
+  - `make qa` runs all checks and passes on a fresh clone using only Docker commands under the hood.
 
 ---
 

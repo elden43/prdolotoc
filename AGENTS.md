@@ -5,10 +5,10 @@
 - **Purpose:** Simple web "kolotoč" for random selection from a user-provided list, with shareable configurations.
 
 ## Stack (Target State)
-- **Backend:** PHP 8.3+, Symfony (latest LTS), pure JSON API only
-- **Database:** PostgreSQL via Doctrine ORM
-- **Frontend:** Next.js (latest) + React + TypeScript, SPA-style UI
-- **Infra:** Docker Compose (PHP-FPM + nginx + Node/Next + PostgreSQL), Makefile helpers
+- **Backend:** PHP 8.3+, Symfony (latest LTS), pure JSON API only, running **exclusively inside Docker** (PHP-FPM + CLI + Composer baked into the image; no host PHP/Composer).
+- **Database:** PostgreSQL via Doctrine ORM (in its own Docker container).
+- **Frontend:** Next.js (latest) + React + TypeScript, SPA-style UI, running in a dedicated Node/Next Docker container.
+- **Infra:** Docker Compose stack (services: `db`, `php-fpm`, `php-cli`, `frontend`, `nginx`) + Makefile helpers. nginx acts as a reverse proxy: `/api` → Symfony backend, `/` → Next frontend.
 
 ## High-Level Domains
 - **SpinConfig** (backend):
@@ -50,15 +50,30 @@
 
 ### Autonomous Coder (Codex engine)
 - Works **task-by-task** from `TASKS.md` (no improvising outside tasks).
+- Operates **entirely inside the Docker stack** – it should never rely on host PHP/Composer/Symfony.
 - For each task:
   - Reads relevant parts of `ARCHITECTURE.md` and existing code.
+  - Uses Makefile + `docker compose` commands for all backend/DB/QA actions (e.g. `make up`, `make qa`, `docker compose run --rm php-cli ...`).
   - Implements changes in a focused branch.
   - Adds/updates tests and Makefile targets as needed, but **does not** change public JSON contracts without updating `ARCHITECTURE.md`.
 - Prefer small, frequent PRs aligned with TASK IDs (e.g. `feature/T2a-spinconfig-entity`).
 
 ### Architectural / Planning Agent (you are here)
 - Updates `ARCHITECTURE.md` and `TASKS.md`.
+- Keeps the architecture **fully Docker-centric** (no assumptions about host PHP/Composer/Symfony).
 - Does **not** write application code.
+
+## Workflow Summary for Agents
+
+- **Bring stack up:** `make up` ⇒ starts `db`, `php-fpm`, `php-cli`, `frontend`, `nginx`.
+- **Run full QA:** `make qa` ⇒ executes backend & frontend tests + linters via containers.
+- **Common ad-hoc commands (examples):**
+  - `docker compose run --rm php-cli composer install`
+  - `docker compose run --rm php-cli php bin/console doctrine:migrations:diff`
+  - `docker compose exec php-fpm php bin/console doctrine:migrations:migrate`
+  - `docker compose run --rm php-cli ./vendor/bin/phpunit`
+
+Agents should prefer these Make/Docker entrypoints instead of calling `php`, `composer`, or `npm` directly on the host.
 
 ## Golden Examples (to be filled later)
 - After first implementation PRs, add 1–2 end-to-end examples:
