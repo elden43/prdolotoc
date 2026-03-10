@@ -4,6 +4,11 @@
 - **Name:** Prďolotoč (prdolotoc)
 - **Purpose:** Simple web "kolotoč" for random selection from a user-provided list, with shareable configurations.
 
+## Branches
+
+- default_branch: feature/20260310-backend-codex
+- architecture_branch: feature/20260310-initial-architecture
+
 ## Stack (Target State)
 - **Backend:** PHP 8.3+, Symfony (latest LTS), pure JSON API only, running **exclusively inside Docker** (PHP-FPM + CLI + Composer baked into the image; no host PHP/Composer).
 - **Database:** PostgreSQL via Doctrine ORM (in its own Docker container).
