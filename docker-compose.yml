@@ -18,10 +18,12 @@ services:
       dockerfile: Dockerfile.php
     working_dir: /app/backend
     volumes:
-      - ./:/app
+      - ./backend:/app/backend
     environment:
       APP_ENV: dev
+      APP_SECRET: dev-secret
       DATABASE_URL: postgresql://prdolotoc:prdolotoc@db:5432/prdolotoc?serverVersion=16&charset=utf8
+      COMPOSER_HOME: /tmp/composer
     depends_on:
       - db
     networks:
@@ -33,10 +35,12 @@ services:
       dockerfile: Dockerfile.php
     working_dir: /app/backend
     volumes:
-      - ./:/app
+      - ./backend:/app/backend
     environment:
       APP_ENV: dev
+      APP_SECRET: dev-secret
       DATABASE_URL: postgresql://prdolotoc:prdolotoc@db:5432/prdolotoc?serverVersion=16&charset=utf8
+      COMPOSER_HOME: /tmp/composer
     depends_on:
       - db
     command: ["sleep", "infinity"]
