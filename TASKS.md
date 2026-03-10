@@ -10,7 +10,7 @@ should be referenced in branches/PRs.
 
 ## Backend – Symfony API & Domain
 
-### T1 – Bootstrap Symfony Backend Skeleton (Docker-only)
+- [x] T1 – Bootstrap Symfony Backend Skeleton (Docker-only)
 - **Depends on:** –
 - **Description:**
   - Create `/backend` Symfony application (latest LTS, PHP 8.3+), API-style skeleton.
@@ -24,7 +24,7 @@ should be referenced in branches/PRs.
   - Backend boots successfully via a container command, e.g. `docker compose run --rm php-cli php bin/console about` from repo root.
   - App bootstrap is committed and ready for further tasks.
 
-### T2 – Configure Doctrine + PostgreSQL Connection (Containerised)
+- [x] T2 – Configure Doctrine + PostgreSQL Connection (Containerised)
 - **Depends on:** T1
 - **Description:**
   - Wire Doctrine ORM to PostgreSQL according to `ARCHITECTURE.md`.
@@ -35,7 +35,7 @@ should be referenced in branches/PRs.
   - `docker compose run --rm php-cli php bin/console doctrine:migrations:diff` runs and sees no errors on empty schema.
   - Connection from the `php-cli` container to the `db` container works in dev.
 
-### T3 – Health Endpoint Implementation
+- [x] T3 – Health Endpoint Implementation
 - **Depends on:** T1, T2 (DB optional but preferred)
 - **Description:**
   - Implement `GET /api/health` endpoint.
@@ -47,7 +47,7 @@ should be referenced in branches/PRs.
   - With the stack up (`make up`), `GET /api/health` via nginx returns HTTP 200 with JSON body `{ "status": "ok" }` in local dev.
   - Corresponding test passes when run via `docker compose run --rm php-cli ./vendor/bin/phpunit`.
 
-### T4 – SpinConfig Entity + Migration
+- [x] T4 – SpinConfig Entity + Migration — PR pending
 - **Depends on:** T2
 - **Description:**
   - Implement `SpinConfig` Doctrine entity and DB migration according to `ARCHITECTURE.md`.
@@ -59,7 +59,7 @@ should be referenced in branches/PRs.
   - Migration runs successfully against dev database via `docker compose exec php-fpm php bin/console doctrine:migrations:migrate`.
   - Table structure matches the domain model in `ARCHITECTURE.md`.
 
-### T5 – SpinConfig Slug Generation Service
+- [ ] T5 – SpinConfig Slug Generation Service
 - **Depends on:** T4
 - **Description:**
   - Implement service responsible for generating unique, URL-safe slugs.
@@ -72,7 +72,7 @@ should be referenced in branches/PRs.
   - Tests cover at least: basic name, duplicate name, non-ASCII characters.
   - Test suite runs successfully via `docker compose run --rm php-cli ./vendor/bin/phpunit`.
 
-### T6 – Global JSON Error Response Helper
+- [ ] T6 – Global JSON Error Response Helper
 - **Depends on:** T1
 - **Description:**
   - Implement reusable helper / listener to shape error responses according to `ARCHITECTURE.md`.
@@ -84,7 +84,7 @@ should be referenced in branches/PRs.
   - Manual 404 or validation errors return JSON structure matching `ARCHITECTURE.md`.
   - At least one test asserts JSON error shape, executed via `docker compose run --rm php-cli ./vendor/bin/phpunit`.
 
-### T7 – POST /api/spin-configs Endpoint
+- [ ] T7 – POST /api/spin-configs Endpoint
 - **Depends on:** T4, T5, T6
 - **Description:**
   - Implement creation endpoint for `SpinConfig`.
@@ -99,7 +99,7 @@ should be referenced in branches/PRs.
   - Invalid payload returns 400 with `error: "validation_failed"` and proper `details`.
   - Basic functional tests (happy path + at least two invalid cases) pass when run via `docker compose run --rm php-cli ./vendor/bin/phpunit`.
 
-### T8 – GET /api/spin-configs/{slugOrId} Endpoint
+- [ ] T8 – GET /api/spin-configs/{slugOrId} Endpoint
 - **Depends on:** T4, T6
 - **Description:**
   - Implement retrieval endpoint for `SpinConfig`.
@@ -111,7 +111,7 @@ should be referenced in branches/PRs.
   - Unknown slug returns 404 with `error: "not_found"` and message as per `ARCHITECTURE.md`.
   - Functional tests cover success + 404 and run via `docker compose run --rm php-cli ./vendor/bin/phpunit`.
 
-### T9 – Backend Test & QA Wiring (Containerised)
+- [ ] T9 – Backend Test & QA Wiring (Containerised)
 - **Depends on:** T3, T7, T8
 - **Description:**
   - Ensure backend has a minimal but reliable test suite and QA commands, all runnable via Docker.
@@ -127,7 +127,7 @@ should be referenced in branches/PRs.
 
 ## Frontend – Next.js SPA
 
-### T10 – Bootstrap Next.js + TypeScript App
+- [ ] T10 – Bootstrap Next.js + TypeScript App
 - **Depends on:** – (can run in parallel with backend tasks)
 - **Description:**
   - Create `/frontend` Next.js app using TypeScript.
@@ -137,7 +137,7 @@ should be referenced in branches/PRs.
 - **Done when:**
   - `cd frontend && npm run dev` starts a working default Next app.
 
-### T11 – Define API Client Types & Configuration
+- [ ] T11 – Define API Client Types & Configuration
 - **Depends on:** T3, T7, T8, T10
 - **Description:**
   - Create a small typed API client layer for calling backend endpoints.
@@ -148,7 +148,7 @@ should be referenced in branches/PRs.
 - **Done when:**
   - API client functions compile and have basic unit tests mocking HTTP.
 
-### T12 – Builder Page (`/`) – Basic Form & Local State
+- [ ] T12 – Builder Page (`/`) – Basic Form & Local State
 - **Depends on:** T10
 - **Description:**
   - Implement the builder view UI and local state (without wiring to API yet).
@@ -159,7 +159,7 @@ should be referenced in branches/PRs.
 - **Done when:**
   - User can fill out the form and local validation errors are shown on submit.
 
-### T13 – Builder Page – API Integration & Navigation
+- [ ] T13 – Builder Page – API Integration & Navigation
 - **Depends on:** T11, T12
 - **Description:**
   - Wire builder form to `POST /api/spin-configs` and navigate on success.
@@ -172,7 +172,7 @@ should be referenced in branches/PRs.
   - Creating a config via the UI results in navigation to `/s/[slug]`.
   - Intentional invalid input shows form errors coming from backend.
 
-### T14 – Spin / Share Page (`/s/[slug]`) – Data Loading & Error States
+- [ ] T14 – Spin / Share Page (`/s/[slug]`) – Data Loading & Error States
 - **Depends on:** T11, T10
 - **Description:**
   - Implement `/s/[slug]` page that loads config and handles loading/error states.
@@ -185,7 +185,7 @@ should be referenced in branches/PRs.
   - Navigating to `/s/[existingSlug]` shows basic config info.
   - Navigating to `/s/nonexistent` shows not-found state.
 
-### T15 – Spin / Share Page – Spin Logic & Visual Modes
+- [ ] T15 – Spin / Share Page – Spin Logic & Visual Modes
 - **Depends on:** T14
 - **Description:**
   - Implement spinning behaviour and basic visual modes.
@@ -200,7 +200,7 @@ should be referenced in branches/PRs.
   - User can repeatedly spin with expected behaviour for each visual mode.
   - `removeAfterPick` works as specified.
 
-### T16 – Frontend Testing & Lint Wiring
+- [ ] T16 – Frontend Testing & Lint Wiring
 - **Depends on:** T11, T12, T13, T14, T15
 - **Description:**
   - Add tests and linters for frontend.
@@ -217,7 +217,7 @@ should be referenced in branches/PRs.
 
 ## Infrastructure – Docker, Nginx, Makefile
 
-### T20 – Docker Compose Skeleton
+- [ ] T20 – Docker Compose Skeleton
 - **Depends on:** T1, T10
 - **Description:**
   - Create `docker-compose.yml` with base services and shared network.
@@ -227,7 +227,7 @@ should be referenced in branches/PRs.
 - **Done when:**
   - `docker compose config` succeeds and shows expected services.
 
-### T21 – PostgreSQL Service Configuration
+- [ ] T21 – PostgreSQL Service Configuration
 - **Depends on:** T20
 - **Description:**
   - Configure `db` service for PostgreSQL.
@@ -237,7 +237,7 @@ should be referenced in branches/PRs.
 - **Done when:**
   - `docker compose up db` starts PostgreSQL and is reachable from host.
 
-### T22 – Backend Service & PHP-FPM Wiring
+- [ ] T22 – Backend Service & PHP-FPM Wiring
 - **Depends on:** T20, T1, T2
 - **Description:**
   - Configure `php-fpm` and `php-cli` services running Symfony via PHP-FPM and CLI.
@@ -250,7 +250,7 @@ should be referenced in branches/PRs.
   - `docker compose up php-fpm` runs PHP-FPM without crashing.
   - `docker compose run --rm php-cli php bin/console about` works from repo root.
 
-### T23 – Frontend Service Configuration
+- [ ] T23 – Frontend Service Configuration
 - **Depends on:** T20, T10
 - **Description:**
   - Configure `frontend` service running Next.js dev server for local dev.
@@ -261,7 +261,7 @@ should be referenced in branches/PRs.
 - **Done when:**
   - `docker compose up frontend` starts Next.js dev server accessible inside the Docker network (and via nginx once T24 is done).
 
-### T24 – Nginx Reverse Proxy & Routing
+- [ ] T24 – Nginx Reverse Proxy & Routing
 - **Depends on:** T22, T23
 - **Description:**
   - Configure `nginx` service to route `/api` to backend and `/` to frontend.
@@ -275,7 +275,7 @@ should be referenced in branches/PRs.
   - `docker compose up nginx php-fpm frontend` allows browsing app via single port (e.g. `http://localhost:8080`).
   - `GET /api/health` routed through nginx works.
 
-### T25 – Logs Directory & Wiring
+- [ ] T25 – Logs Directory & Wiring
 - **Depends on:** T20, T24
 - **Description:**
   - Ensure logs are collected under `/logs` and git-ignored.
@@ -285,7 +285,7 @@ should be referenced in branches/PRs.
 - **Done when:**
   - Running stack writes logs into `./logs` (e.g. `logs/nginx/access.log`).
 
-### T26 – Top-Level Makefile + Local Dev Workflow
+- [ ] T26 – Top-Level Makefile + Local Dev Workflow
 - **Depends on:** T21, T22, T23, T24, T25, T9, T16
 - **Description:**
   - Implement Makefile commands described in `ARCHITECTURE.md` and define the canonical local dev workflow.
@@ -304,7 +304,7 @@ should be referenced in branches/PRs.
 
 ## Glue / Polish
 
-### T30 – End-to-End Manual Verification Script (Docs)
+- [ ] T30 – End-to-End Manual Verification Script (Docs)
 - **Depends on:** T13, T15, T24, T26
 - **Description:**
   - Add a short section (e.g. in `README.md` or a new `MANUAL-QA.md`) describing how to run the whole stack and manually verify core flows.
@@ -316,7 +316,7 @@ should be referenced in branches/PRs.
 - **Done when:**
   - Document exists and is easy to follow on a clean environment.
 
-### T31 – Golden JSON Examples
+- [ ] T31 – Golden JSON Examples
 - **Depends on:** T7, T8
 - **Description:**
   - Populate "Golden Examples" section in `AGENTS.md`.
