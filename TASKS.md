@@ -148,7 +148,7 @@ should be referenced in branches/PRs.
 - **Done when:**
   - API client functions compile and have basic unit tests mocking HTTP.
 
-- [ ] T12 – Builder Page (`/`) – Basic Form & Local State
+- [x] T12 – Builder Page (`/`) – Basic Form & Local State — PR #8 ✅
 - **Depends on:** T10
 - **Description:**
   - Implement the builder view UI and local state (without wiring to API yet).
