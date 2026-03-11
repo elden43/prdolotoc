@@ -285,7 +285,7 @@ should be referenced in branches/PRs.
 - **Done when:**
   - Running stack writes logs into `./logs` (e.g. `logs/nginx/access.log`).
 
-- [ ] T26 – Top-Level Makefile + Local Dev Workflow
+- [x] T26 – Top-Level Makefile + Local Dev Workflow — PR #18 ✅
 - **Depends on:** T21, T22, T23, T24, T25, T9, T16
 - **Description:**
   - Implement Makefile commands described in `ARCHITECTURE.md` and define the canonical local dev workflow.
