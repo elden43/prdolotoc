@@ -111,7 +111,7 @@ should be referenced in branches/PRs.
   - Unknown slug returns 404 with `error: "not_found"` and message as per `ARCHITECTURE.md`.
   - Functional tests cover success + 404 and run via `docker compose run --rm php-cli ./vendor/bin/phpunit`.
 
-- [ ] T9 – Backend Test & QA Wiring (Containerised)
+- [x] T9 – Backend Test & QA Wiring (Containerised) — PR #5 ✅
 - **Depends on:** T3, T7, T8
 - **Description:**
   - Ensure backend has a minimal but reliable test suite and QA commands, all runnable via Docker.
