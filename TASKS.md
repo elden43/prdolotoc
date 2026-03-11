@@ -172,7 +172,7 @@ should be referenced in branches/PRs.
   - Creating a config via the UI results in navigation to `/s/[slug]`.
   - Intentional invalid input shows form errors coming from backend.
 
-- [ ] T14 – Spin / Share Page (`/s/[slug]`) – Data Loading & Error States
+- [x] T14 – Spin / Share Page (`/s/[slug]`) – Data Loading & Error States
 - **Depends on:** T11, T10
 - **Description:**
   - Implement `/s/[slug]` page that loads config and handles loading/error states.
@@ -185,7 +185,7 @@ should be referenced in branches/PRs.
   - Navigating to `/s/[existingSlug]` shows basic config info.
   - Navigating to `/s/nonexistent` shows not-found state.
 
-- [ ] T15 – Spin / Share Page – Spin Logic & Visual Modes
+- [x] T15 – Spin / Share Page – Spin Logic & Visual Modes — PR #10 ✅
 - **Depends on:** T14
 - **Description:**
   - Implement spinning behaviour and basic visual modes.
@@ -200,7 +200,7 @@ should be referenced in branches/PRs.
   - User can repeatedly spin with expected behaviour for each visual mode.
   - `removeAfterPick` works as specified.
 
-- [ ] T16 – Frontend Testing & Lint Wiring
+- [x] T16 – Frontend Testing & Lint Wiring — PR #11 ✅
 - **Depends on:** T11, T12, T13, T14, T15
 - **Description:**
   - Add tests and linters for frontend.
