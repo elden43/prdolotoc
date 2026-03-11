@@ -5,13 +5,25 @@ namespace App\Tests\Controller;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
- * Functional tests for POST /api/spin-configs.
+ * Functional tests for POST /api/spin-configs and GET /api/spin-configs/{slugOrId}.
  */
 final class SpinConfigControllerTest extends WebTestCase
 {
-    private function postSpinConfig(mixed $payload): array
+    private function getSpinConfig(string $slugOrId, ?\Symfony\Bundle\FrameworkBundle\KernelBrowser $client = null): array
     {
-        $client = static::createClient();
+        $client ??= static::createClient();
+        $client->request('GET', '/api/spin-configs/' . $slugOrId);
+
+        return [
+            'status' => $client->getResponse()->getStatusCode(),
+            'body'   => json_decode((string) $client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR),
+            'client' => $client,
+        ];
+    }
+
+    private function postSpinConfig(mixed $payload, ?\Symfony\Bundle\FrameworkBundle\KernelBrowser $client = null): array
+    {
+        $client ??= static::createClient();
         $client->request(
             'POST',
             '/api/spin-configs',
@@ -24,6 +36,7 @@ final class SpinConfigControllerTest extends WebTestCase
         return [
             'status' => $client->getResponse()->getStatusCode(),
             'body'   => json_decode((string) $client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR),
+            'client' => $client,
         ];
     }
 
@@ -135,5 +148,40 @@ final class SpinConfigControllerTest extends WebTestCase
 
         self::assertSame(201, $result['status']);
         self::assertStringStartsWith('my-awesome-config', $result['body']['slug']);
+    }
+
+    public function testGetSpinConfigBySlug(): void
+    {
+        $created = $this->postSpinConfig([
+            'name'            => 'Get Test Config',
+            'options'         => ['One', 'Two'],
+            'removeAfterPick' => false,
+            'visualMode'      => 'slow',
+        ]);
+
+        self::assertSame(201, $created['status']);
+        $slug = $created['body']['slug'];
+
+        $result = $this->getSpinConfig($slug, $created['client']);
+
+        self::assertSame(200, $result['status']);
+        $body = $result['body'];
+        self::assertSame($slug, $body['slug']);
+        self::assertSame('Get Test Config', $body['name']);
+        self::assertSame(['One', 'Two'], $body['options']);
+        self::assertFalse($body['removeAfterPick']);
+        self::assertSame('slow', $body['visualMode']);
+        self::assertArrayHasKey('id', $body);
+        self::assertArrayHasKey('createdAt', $body);
+    }
+
+    public function testGetSpinConfigUnknownSlugReturns404(): void
+    {
+        $result = $this->getSpinConfig('this-slug-does-not-exist');
+
+        self::assertSame(404, $result['status']);
+        $body = $result['body'];
+        self::assertSame('not_found', $body['error']);
+        self::assertArrayHasKey('message', $body);
     }
 }

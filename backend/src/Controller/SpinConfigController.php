@@ -9,6 +9,7 @@ use App\Service\SlugGeneratorService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class SpinConfigController
@@ -20,6 +21,22 @@ final class SpinConfigController
         private readonly SpinConfigRepository $repository,
         private readonly SlugGeneratorService $slugGenerator,
     ) {}
+
+    #[Route('/api/spin-configs/{slugOrId}', name: 'api_spin_configs_get', methods: ['GET'])]
+    public function get(string $slugOrId): JsonResponse
+    {
+        $spinConfig = $this->repository->findOneBy(['slug' => $slugOrId]);
+
+        if ($spinConfig === null && is_numeric($slugOrId)) {
+            $spinConfig = $this->repository->find((int) $slugOrId);
+        }
+
+        if ($spinConfig === null) {
+            throw new NotFoundHttpException('SpinConfig not found');
+        }
+
+        return new JsonResponse($this->normalize($spinConfig));
+    }
 
     #[Route('/api/spin-configs', name: 'api_spin_configs_create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
