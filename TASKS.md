@@ -275,7 +275,7 @@ should be referenced in branches/PRs.
   - `docker compose up nginx php-fpm frontend` allows browsing app via single port (e.g. `http://localhost:8080`).
   - `GET /api/health` routed through nginx works.
 
-- [ ] T25 – Logs Directory & Wiring
+- [x] T25 – Logs Directory & Wiring — PR #17 ✅
 - **Depends on:** T20, T24
 - **Description:**
   - Ensure logs are collected under `/logs` and git-ignored.
