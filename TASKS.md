@@ -200,7 +200,7 @@ should be referenced in branches/PRs.
   - User can repeatedly spin with expected behaviour for each visual mode.
   - `removeAfterPick` works as specified.
 
-- [ ] T16 – Frontend Testing & Lint Wiring
+- [x] T16 – Frontend Testing & Lint Wiring — PR #11 ✅
 - **Depends on:** T11, T12, T13, T14, T15
 - **Description:**
   - Add tests and linters for frontend.
