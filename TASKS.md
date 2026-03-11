@@ -227,7 +227,7 @@ should be referenced in branches/PRs.
 - **Done when:**
   - `docker compose config` succeeds and shows expected services.
 
-- [ ] T21 – PostgreSQL Service Configuration
+- [x] T21 – PostgreSQL Service Configuration — PR pending
 - **Depends on:** T20
 - **Description:**
   - Configure `db` service for PostgreSQL.
