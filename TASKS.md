@@ -59,7 +59,7 @@ should be referenced in branches/PRs.
   - Migration runs successfully against dev database via `docker compose exec php-fpm php bin/console doctrine:migrations:migrate`.
   - Table structure matches the domain model in `ARCHITECTURE.md`.
 
-- [ ] T5 – SpinConfig Slug Generation Service
+- [x] T5 – SpinConfig Slug Generation Service — PR #1 ✅
 - **Depends on:** T4
 - **Description:**
   - Implement service responsible for generating unique, URL-safe slugs.
