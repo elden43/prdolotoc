@@ -172,7 +172,7 @@ should be referenced in branches/PRs.
   - Creating a config via the UI results in navigation to `/s/[slug]`.
   - Intentional invalid input shows form errors coming from backend.
 
-- [ ] T14 – Spin / Share Page (`/s/[slug]`) – Data Loading & Error States
+- [x] T14 – Spin / Share Page (`/s/[slug]`) – Data Loading & Error States
 - **Depends on:** T11, T10
 - **Description:**
   - Implement `/s/[slug]` page that loads config and handles loading/error states.
@@ -185,7 +185,7 @@ should be referenced in branches/PRs.
   - Navigating to `/s/[existingSlug]` shows basic config info.
   - Navigating to `/s/nonexistent` shows not-found state.
 
-- [ ] T15 – Spin / Share Page – Spin Logic & Visual Modes
+- [x] T15 – Spin / Share Page – Spin Logic & Visual Modes — PR #10 ✅
 - **Depends on:** T14
 - **Description:**
   - Implement spinning behaviour and basic visual modes.
@@ -200,7 +200,7 @@ should be referenced in branches/PRs.
   - User can repeatedly spin with expected behaviour for each visual mode.
   - `removeAfterPick` works as specified.
 
-- [ ] T16 – Frontend Testing & Lint Wiring
+- [x] T16 – Frontend Testing & Lint Wiring — PR #11 ✅
 - **Depends on:** T11, T12, T13, T14, T15
 - **Description:**
   - Add tests and linters for frontend.
@@ -217,7 +217,7 @@ should be referenced in branches/PRs.
 
 ## Infrastructure – Docker, Nginx, Makefile
 
-- [ ] T20 – Docker Compose Skeleton
+- [x] T20 – Docker Compose Skeleton — PR #12 ✅
 - **Depends on:** T1, T10
 - **Description:**
   - Create `docker-compose.yml` with base services and shared network.
@@ -227,7 +227,7 @@ should be referenced in branches/PRs.
 - **Done when:**
   - `docker compose config` succeeds and shows expected services.
 
-- [ ] T21 – PostgreSQL Service Configuration
+- [x] T21 – PostgreSQL Service Configuration — PR pending
 - **Depends on:** T20
 - **Description:**
   - Configure `db` service for PostgreSQL.
@@ -237,7 +237,7 @@ should be referenced in branches/PRs.
 - **Done when:**
   - `docker compose up db` starts PostgreSQL and is reachable from host.
 
-- [ ] T22 – Backend Service & PHP-FPM Wiring
+- [x] T22 – Backend Service & PHP-FPM Wiring — PR #14 ✅
 - **Depends on:** T20, T1, T2
 - **Description:**
   - Configure `php-fpm` and `php-cli` services running Symfony via PHP-FPM and CLI.
@@ -250,7 +250,7 @@ should be referenced in branches/PRs.
   - `docker compose up php-fpm` runs PHP-FPM without crashing.
   - `docker compose run --rm php-cli php bin/console about` works from repo root.
 
-- [ ] T23 – Frontend Service Configuration
+- [x] T23 – Frontend Service Configuration — PR #15 ✅
 - **Depends on:** T20, T10
 - **Description:**
   - Configure `frontend` service running Next.js dev server for local dev.
