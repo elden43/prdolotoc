@@ -72,7 +72,7 @@ should be referenced in branches/PRs.
   - Tests cover at least: basic name, duplicate name, non-ASCII characters.
   - Test suite runs successfully via `docker compose run --rm php-cli ./vendor/bin/phpunit`.
 
-- [ ] T6 – Global JSON Error Response Helper
+- [x] T6 – Global JSON Error Response Helper — PR #2 ✅
 - **Depends on:** T1
 - **Description:**
   - Implement reusable helper / listener to shape error responses according to `ARCHITECTURE.md`.
