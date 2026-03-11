@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createSpinConfig, ApiError } from "../lib/api";
 import type { VisualMode } from "../lib/api";
 import styles from "./page.module.css";
 
@@ -43,9 +45,12 @@ function validateForm(state: FormState): FormErrors {
 }
 
 export default function BuilderPage() {
+  const router = useRouter();
   const [form, setForm] = useState<FormState>(initialState);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [genericError, setGenericError] = useState<string | null>(null);
 
   function handleChange(
     e: React.ChangeEvent<
@@ -71,9 +76,10 @@ export default function BuilderPage() {
     }
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitted(true);
+    setGenericError(null);
     const validationErrors = validateForm(form);
     setErrors(validationErrors);
 
@@ -81,10 +87,33 @@ export default function BuilderPage() {
       return;
     }
 
-    // API wiring is done in T13 – placeholder for now
-    alert(
-      `Formulář je platný!\n\nNázev: ${form.name}\nMožnosti: ${form.options.split("\n").filter((l) => l.trim()).join(", ")}\nOdstranit po výběru: ${form.removeAfterPick}\nVizuální mód: ${form.visualMode}`,
-    );
+    const options = form.options
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
+
+    setSubmitting(true);
+    try {
+      const config = await createSpinConfig({
+        name: form.name.trim(),
+        options,
+        removeAfterPick: form.removeAfterPick,
+        visualMode: form.visualMode,
+      });
+      router.push(`/s/${config.slug}`);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 400 && err.body.details) {
+        const backendErrors: FormErrors = {};
+        const details = err.body.details;
+        if (details.name?.length) backendErrors.name = details.name[0];
+        if (details.options?.length) backendErrors.options = details.options[0];
+        setErrors(backendErrors);
+      } else {
+        setGenericError("Nepodařilo se vytvořit konfiguraci. Zkuste to prosím znovu.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -94,6 +123,10 @@ export default function BuilderPage() {
         <p className={styles.subtitle}>
           Vytvořte si vlastní roztočitelný seznam možností.
         </p>
+
+        {genericError && (
+          <p className={styles.genericError}>{genericError}</p>
+        )}
 
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
           <div className={styles.field}>
@@ -166,8 +199,8 @@ export default function BuilderPage() {
           </div>
 
           <div className={styles.actions}>
-            <button type="submit" className={styles.primaryBtn}>
-              Roztočit!
+            <button type="submit" className={styles.primaryBtn} disabled={submitting}>
+              {submitting ? "Ukládám…" : "Roztočit!"}
             </button>
           </div>
         </form>

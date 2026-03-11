@@ -143,3 +143,26 @@
 .primaryBtn:active {
   background: #2a56d0;
 }
+
+.primaryBtn:disabled {
+  background: #9ab0f5;
+  cursor: not-allowed;
+}
+
+.genericError {
+  background: #fff5f5;
+  border: 1px solid #fc8181;
+  border-radius: 6px;
+  color: #c53030;
+  font-size: 0.9rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .genericError {
+    background: #2d1515;
+    border-color: #e53e3e;
+    color: #fc8181;
+  }
+}
