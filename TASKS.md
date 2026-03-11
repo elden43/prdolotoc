@@ -127,7 +127,7 @@ should be referenced in branches/PRs.
 
 ## Frontend – Next.js SPA
 
-- [ ] T10 – Bootstrap Next.js + TypeScript App
+- [x] T10 – Bootstrap Next.js + TypeScript App — PR #6 ✅
 - **Depends on:** – (can run in parallel with backend tasks)
 - **Description:**
   - Create `/frontend` Next.js app using TypeScript.
