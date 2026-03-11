@@ -304,7 +304,7 @@ should be referenced in branches/PRs.
 
 ## Glue / Polish
 
-- [ ] T30 – End-to-End Manual Verification Script (Docs)
+- [x] T30 – End-to-End Manual Verification Script (Docs) — PR #19 ✅
 - **Depends on:** T13, T15, T24, T26
 - **Description:**
   - Add a short section (e.g. in `README.md` or a new `MANUAL-QA.md`) describing how to run the whole stack and manually verify core flows.
