@@ -261,7 +261,7 @@ should be referenced in branches/PRs.
 - **Done when:**
   - `docker compose up frontend` starts Next.js dev server accessible inside the Docker network (and via nginx once T24 is done).
 
-- [ ] T24 – Nginx Reverse Proxy & Routing
+- [x] T24 – Nginx Reverse Proxy & Routing — PR #16 ✅
 - **Depends on:** T22, T23
 - **Description:**
   - Configure `nginx` service to route `/api` to backend and `/` to frontend.
