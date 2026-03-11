@@ -172,7 +172,7 @@ should be referenced in branches/PRs.
   - Creating a config via the UI results in navigation to `/s/[slug]`.
   - Intentional invalid input shows form errors coming from backend.
 
-- [ ] T14 – Spin / Share Page (`/s/[slug]`) – Data Loading & Error States
+- [x] T14 – Spin / Share Page (`/s/[slug]`) – Data Loading & Error States
 - **Depends on:** T11, T10
 - **Description:**
   - Implement `/s/[slug]` page that loads config and handles loading/error states.
