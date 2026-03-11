@@ -237,7 +237,7 @@ should be referenced in branches/PRs.
 - **Done when:**
   - `docker compose up db` starts PostgreSQL and is reachable from host.
 
-- [ ] T22 – Backend Service & PHP-FPM Wiring
+- [x] T22 – Backend Service & PHP-FPM Wiring — PR #14 ✅
 - **Depends on:** T20, T1, T2
 - **Description:**
   - Configure `php-fpm` and `php-cli` services running Symfony via PHP-FPM and CLI.
