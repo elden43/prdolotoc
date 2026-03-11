@@ -1,6 +1,6 @@
 COMPOSE := docker compose
 
-.PHONY: up down logs backend-shell frontend-shell db-shell qa test lint build
+.PHONY: up down logs backend-shell frontend-shell db-shell qa test test-backend lint build
 
 up:
 	@mkdir -p logs/nginx logs/backend logs/frontend
@@ -23,8 +23,10 @@ db-shell:
 
 qa: test lint
 
-test:
-	$(COMPOSE) run --rm php-cli ./vendor/bin/phpunit
+test: test-backend
+
+test-backend:
+	$(COMPOSE) run --rm php-cli composer test
 
 lint:
 	$(COMPOSE) run --rm php-cli php bin/console lint:container
