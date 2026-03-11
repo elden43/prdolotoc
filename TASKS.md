@@ -217,7 +217,7 @@ should be referenced in branches/PRs.
 
 ## Infrastructure – Docker, Nginx, Makefile
 
-- [ ] T20 – Docker Compose Skeleton
+- [x] T20 – Docker Compose Skeleton — PR #12 ✅
 - **Depends on:** T1, T10
 - **Description:**
   - Create `docker-compose.yml` with base services and shared network.
