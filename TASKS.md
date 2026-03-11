@@ -250,7 +250,7 @@ should be referenced in branches/PRs.
   - `docker compose up php-fpm` runs PHP-FPM without crashing.
   - `docker compose run --rm php-cli php bin/console about` works from repo root.
 
-- [ ] T23 – Frontend Service Configuration
+- [x] T23 – Frontend Service Configuration — PR #15 ✅
 - **Depends on:** T20, T10
 - **Description:**
   - Configure `frontend` service running Next.js dev server for local dev.
