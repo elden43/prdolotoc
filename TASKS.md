@@ -99,7 +99,7 @@ should be referenced in branches/PRs.
   - Invalid payload returns 400 with `error: "validation_failed"` and proper `details`.
   - Basic functional tests (happy path + at least two invalid cases) pass when run via `docker compose run --rm php-cli ./vendor/bin/phpunit`.
 
-- [ ] T8 – GET /api/spin-configs/{slugOrId} Endpoint
+- [x] T8 – GET /api/spin-configs/{slugOrId} Endpoint — PR #4 ✅
 - **Depends on:** T4, T6
 - **Description:**
   - Implement retrieval endpoint for `SpinConfig`.
