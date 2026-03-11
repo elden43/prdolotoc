@@ -159,7 +159,7 @@ should be referenced in branches/PRs.
 - **Done when:**
   - User can fill out the form and local validation errors are shown on submit.
 
-- [ ] T13 – Builder Page – API Integration & Navigation
+- [x] T13 – Builder Page – API Integration & Navigation — PR #9 ✅
 - **Depends on:** T11, T12
 - **Description:**
   - Wire builder form to `POST /api/spin-configs` and navigate on success.
