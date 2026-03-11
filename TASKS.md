@@ -137,7 +137,7 @@ should be referenced in branches/PRs.
 - **Done when:**
   - `cd frontend && npm run dev` starts a working default Next app.
 
-- [ ] T11 – Define API Client Types & Configuration
+- [x] T11 – Define API Client Types & Configuration — PR #7 ✅
 - **Depends on:** T3, T7, T8, T10
 - **Description:**
   - Create a small typed API client layer for calling backend endpoints.
