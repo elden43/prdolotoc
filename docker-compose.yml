@@ -16,9 +16,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.php
-    working_dir: /app/backend
+    working_dir: /backend
     volumes:
-      - ./backend:/app/backend
+      - ./backend:/backend
     environment:
       APP_ENV: dev
       APP_SECRET: dev-secret
@@ -33,9 +33,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.php
-    working_dir: /app/backend
+    working_dir: /backend
     volumes:
-      - ./backend:/app/backend
+      - ./backend:/backend
     environment:
       APP_ENV: dev
       APP_SECRET: dev-secret
