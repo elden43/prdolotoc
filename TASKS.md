@@ -84,7 +84,7 @@ should be referenced in branches/PRs.
   - Manual 404 or validation errors return JSON structure matching `ARCHITECTURE.md`.
   - At least one test asserts JSON error shape, executed via `docker compose run --rm php-cli ./vendor/bin/phpunit`.
 
-- [ ] T7 – POST /api/spin-configs Endpoint
+- [x] T7 – POST /api/spin-configs Endpoint — PR #3 ✅
 - **Depends on:** T4, T5, T6
 - **Description:**
   - Implement creation endpoint for `SpinConfig`.
