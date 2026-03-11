@@ -1,6 +1,8 @@
 COMPOSE := docker compose
+BACKEND_RUN := $(COMPOSE) run --rm php-cli
+FRONTEND_RUN := $(COMPOSE) run --rm frontend sh -lc
 
-.PHONY: up down logs backend-shell frontend-shell db-shell qa test lint build
+.PHONY: up down logs backend-shell frontend-shell db-shell qa test lint build backend-deps frontend-deps
 
 up:
 	@mkdir -p logs/nginx logs/backend logs/frontend
@@ -21,13 +23,21 @@ frontend-shell:
 db-shell:
 	$(COMPOSE) exec db psql -U prdolotoc -d prdolotoc
 
-qa: test lint
+qa: backend-deps frontend-deps test lint
 
 test:
-	$(COMPOSE) run --rm php-cli ./vendor/bin/phpunit
+	$(BACKEND_RUN) ./vendor/bin/phpunit
+	$(FRONTEND_RUN) "cd /app/frontend && npm test"
 
 lint:
-	$(COMPOSE) run --rm php-cli php bin/console lint:container
+	$(BACKEND_RUN) php bin/console lint:container
+	$(FRONTEND_RUN) "cd /app/frontend && npm run lint && npx tsc --noEmit"
 
 build:
 	$(COMPOSE) build
+
+backend-deps:
+	$(BACKEND_RUN) composer install --no-interaction --prefer-dist
+
+frontend-deps:
+	$(FRONTEND_RUN) "cd /app/frontend && rm -rf node_modules package-lock.json && npm install --no-package-lock"
