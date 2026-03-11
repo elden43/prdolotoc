@@ -185,7 +185,7 @@ should be referenced in branches/PRs.
   - Navigating to `/s/[existingSlug]` shows basic config info.
   - Navigating to `/s/nonexistent` shows not-found state.
 
-- [ ] T15 – Spin / Share Page – Spin Logic & Visual Modes
+- [x] T15 – Spin / Share Page – Spin Logic & Visual Modes — PR #10 ✅
 - **Depends on:** T14
 - **Description:**
   - Implement spinning behaviour and basic visual modes.
